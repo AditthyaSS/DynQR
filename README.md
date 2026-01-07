@@ -73,8 +73,8 @@ Dynamic QR (dynQR):
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/dynqr.git
-cd dynqr
+git clone https://github.com/AditthyaSS/DynQR.git
+cd DynQR
 ```
 
 ### 2. Install Dependencies
@@ -202,13 +202,22 @@ Row Level Security (RLS) ensures users can only access their own QR codes.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+**Contributions are welcomed!** 🎉
+
+Whether it's bug fixes, new features, documentation improvements, or ideas - we'd love your help!
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+### Ideas for Contributions:
+- 🎨 Custom QR code colors/logos
+- 📊 Advanced analytics dashboard
+- 🔗 Bulk QR code creation
+- 📱 PWA support
+- 🌍 Internationalization (i18n)
 
 ---
 
@@ -231,6 +240,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ for the open source community**
 
-[⭐ Star this repo](https://github.com/yourusername/dynqr) if you find it useful!
+[⭐ Star this repo](https://github.com/AditthyaSS/DynQR) if you find it useful!
 
 </div>
