@@ -20,6 +20,8 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
+import { useQRCustomization } from '@/hooks/use-qr-customization'
+import { QRCustomizationPanel } from '@/components/qr-customization-panel'
 
 export default function CreateQRCodePage() {
     const [name, setName] = useState('')
@@ -34,6 +36,17 @@ export default function CreateQRCodePage() {
     } | null>(null)
     const [qrImageUrl, setQrImageUrl] = useState<string | null>(null)
     const [copied, setCopied] = useState(false)
+
+    // QR Customization hook
+    const {
+        customization,
+        setForegroundColor,
+        setBackgroundColor,
+        setPattern,
+        resetToDefaults,
+        hasLowContrast,
+        generatePreview,
+    } = useQRCustomization()
 
     const router = useRouter()
     const supabase = createClient()
@@ -71,17 +84,23 @@ export default function CreateQRCodePage() {
             const code = data.code
             setCreatedCode(code)
 
-            // Generate QR image
+            // Generate QR image with customization (client-side)
             const qrUrl = `${getBaseUrl()}/qr/${code.short_id}`
-            const qrResponse = await fetch('/api/generate-qr', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: qrUrl }),
-            })
+            const customQrImage = await generatePreview(qrUrl)
 
-            const qrData = await qrResponse.json()
-            if (qrResponse.ok) {
-                setQrImageUrl(qrData.qr_data_url)
+            if (customQrImage) {
+                setQrImageUrl(customQrImage)
+            } else {
+                // Fallback to server-side generation
+                const qrResponse = await fetch('/api/generate-qr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: qrUrl }),
+                })
+                const qrData = await qrResponse.json()
+                if (qrResponse.ok) {
+                    setQrImageUrl(qrData.qr_data_url)
+                }
             }
 
             toast.success('QR code created successfully!')
@@ -108,6 +127,17 @@ export default function CreateQRCodePage() {
         link.download = `${createdCode.name.replace(/\s+/g, '_')}_qr.png`
         link.click()
         toast.success('QR code downloaded!')
+    }
+
+    const handleCreateAnother = () => {
+        // Reset all state to start fresh
+        setName('')
+        setUrl('')
+        setDescription('')
+        setCreatedCode(null)
+        setQrImageUrl(null)
+        setCopied(false)
+        resetToDefaults()
     }
 
     const handleSignOut = async () => {
@@ -219,11 +249,13 @@ export default function CreateQRCodePage() {
                             </div>
 
                             <div className="text-center pt-4">
-                                <Link href="/dashboard/codes/new">
-                                    <Button variant="ghost" className="text-slate-400 hover:text-white">
-                                        Create Another QR Code
-                                    </Button>
-                                </Link>
+                                <Button
+                                    variant="ghost"
+                                    className="text-slate-400 hover:text-white"
+                                    onClick={handleCreateAnother}
+                                >
+                                    Create Another QR Code
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -307,6 +339,16 @@ export default function CreateQRCodePage() {
                                     className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
                                 />
                             </div>
+
+                            {/* QR Customization Section */}
+                            <QRCustomizationPanel
+                                customization={customization}
+                                onForegroundColorChange={setForegroundColor}
+                                onBackgroundColorChange={setBackgroundColor}
+                                onPatternChange={setPattern}
+                                onReset={resetToDefaults}
+                                hasLowContrast={hasLowContrast}
+                            />
 
                             <Button
                                 type="submit"

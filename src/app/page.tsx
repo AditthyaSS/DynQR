@@ -171,6 +171,11 @@ export default function LandingPage() {
             <span className="text-sm">MIT License</span>
           </div>
         </div>
+        <div className="max-w-6xl mx-auto mt-4 pt-4 border-t border-slate-800/50 text-center">
+          <p className="text-sm text-slate-500">
+            Made with <span className="text-red-400">❤️</span> by <span className="text-purple-400 font-medium">Aditthya SS Varma</span> from <span className="text-orange-400">India</span> 🇮🇳
+          </p>
+        </div>
       </footer>
     </div>
   )
