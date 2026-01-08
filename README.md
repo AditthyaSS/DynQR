@@ -35,6 +35,79 @@ Dynamic QR (dynQR):
 
 ---
 
+## 🏗️ How Prototype Works - Architecture
+
+```mermaid
+flowchart TB
+    subgraph USER["👤 User Flow"]
+        A[📱 Scan QR Code] --> B[🌐 GET /qr/abc123]
+    end
+    
+    subgraph NEXTJS["⚡ Next.js App"]
+        B --> C{Active?}
+        C -->|Yes| D[✅ HTTP 302 Redirect]
+        C -->|No| E[❌ Show Error Page]
+    end
+    
+    subgraph SUPABASE["🗄️ Supabase"]
+        C -.->|Query| F[(PostgreSQL)]
+        F -.->|Response| C
+        D -.->|Update scan_count| F
+    end
+    
+    subgraph DASHBOARD["📊 Dashboard"]
+        G[🔐 Auth User] --> H[Create/Edit QR]
+        H --> F
+        G --> I[View Analytics]
+        F --> I
+    end
+    
+    D --> J[🎯 Destination URL]
+    
+    style USER fill:#e1f5fe
+    style NEXTJS fill:#fff3e0
+    style SUPABASE fill:#e8f5e9
+    style DASHBOARD fill:#f3e5f5
+```
+
+### Architecture Components
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Frontend** | Next.js 14 + React | Server-side rendering, dynamic routes |
+| **API Layer** | Next.js API Routes | CRUD operations, QR generation |
+| **Database** | Supabase PostgreSQL | Store QR codes, analytics, user data |
+| **Authentication** | Supabase Auth | User login, signup, session management |
+| **QR Engine** | `qrcode` npm package | Generate QR code images on-demand |
+
+### Request Flow
+
+```
+1. 📱 User scans QR → Points to: https://app.com/qr/abc123
+                          ↓
+2. ⚡ Next.js Route → /qr/[shortId]/page.tsx handles request
+                          ↓
+3. 🗄️ Database Query → SELECT * FROM qr_codes WHERE short_id = 'abc123'
+                          ↓
+4. 🔀 Decision Point → Is code active AND exists?
+         ↓                              ↓
+       ✅ YES                         ❌ NO
+         ↓                              ↓
+5a. 📊 Update Stats           5b. 🚫 Show Error
+    (scan_count++)                 (404 or inactive)
+         ↓
+6. 🎯 HTTP 302 Redirect → User lands on current_url
+```
+
+### Security Layers
+
+- **Row Level Security (RLS)** - Users can only access their own QR codes
+- **Authenticated Routes** - Dashboard requires login via Supabase Auth
+- **Public Redirect** - `/qr/[shortId]` is public for scanning without login
+- **Service Role Key** - Used only in secure API routes for privileged operations
+
+---
+
 ## ✨ Features
 
 - ✅ **Unlimited QR Codes** - Create as many as you need, forever free
