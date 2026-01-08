@@ -36,6 +36,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import type { QRCode } from '@/lib/types/database.types'
 import Image from 'next/image'
+import { QRLifespanPanel, QRLifespanConfig, DEFAULT_LIFESPAN_CONFIG } from '@/components/qr-lifespan-panel'
 
 export default function EditQRCodePage() {
     const params = useParams()
@@ -51,6 +52,7 @@ export default function EditQRCodePage() {
     const [qrImageUrl, setQrImageUrl] = useState<string | null>(null)
     const [copied, setCopied] = useState(false)
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [lifespanConfig, setLifespanConfig] = useState<QRLifespanConfig>(DEFAULT_LIFESPAN_CONFIG)
 
     const router = useRouter()
     const supabase = createClient()
@@ -80,6 +82,11 @@ export default function EditQRCodePage() {
                 setUrl(qrCode.current_url)
                 setDescription(qrCode.description || '')
                 setIsActive(qrCode.is_active)
+                setLifespanConfig({
+                    maxScans: qrCode.max_scans ?? null,
+                    expiresAt: qrCode.expires_at ?? null,
+                    fallbackUrl: qrCode.fallback_url ?? null,
+                })
 
                 // Generate QR image
                 const qrUrl = `${getBaseUrl()}/qr/${qrCode.short_id}`
@@ -115,6 +122,9 @@ export default function EditQRCodePage() {
                     current_url: url,
                     description: description || null,
                     is_active: isActive,
+                    max_scans: lifespanConfig.maxScans,
+                    expires_at: lifespanConfig.expiresAt,
+                    fallback_url: lifespanConfig.fallbackUrl,
                 }),
             })
 
@@ -375,6 +385,16 @@ export default function EditQRCodePage() {
                                     onCheckedChange={setIsActive}
                                 />
                             </div>
+
+                            {/* QR Lifespan Section */}
+                            <QRLifespanPanel
+                                config={lifespanConfig}
+                                onMaxScansChange={(v) => setLifespanConfig(c => ({ ...c, maxScans: v }))}
+                                onExpiresAtChange={(v) => setLifespanConfig(c => ({ ...c, expiresAt: v }))}
+                                onFallbackUrlChange={(v) => setLifespanConfig(c => ({ ...c, fallbackUrl: v }))}
+                                onReset={() => setLifespanConfig(DEFAULT_LIFESPAN_CONFIG)}
+                                currentScanCount={code.scan_count}
+                            />
 
                             <div className="flex flex-col sm:flex-row gap-3 pt-4">
                                 <Button

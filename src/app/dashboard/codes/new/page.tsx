@@ -22,6 +22,7 @@ import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 import { useQRCustomization } from '@/hooks/use-qr-customization'
 import { QRCustomizationPanel } from '@/components/qr-customization-panel'
+import { QRLifespanPanel, QRLifespanConfig, DEFAULT_LIFESPAN_CONFIG } from '@/components/qr-lifespan-panel'
 
 export default function CreateQRCodePage() {
     const [name, setName] = useState('')
@@ -43,10 +44,13 @@ export default function CreateQRCodePage() {
         setForegroundColor,
         setBackgroundColor,
         setPattern,
-        resetToDefaults,
+        resetToDefaults: resetCustomization,
         hasLowContrast,
         generatePreview,
     } = useQRCustomization()
+
+    // QR Lifespan state
+    const [lifespanConfig, setLifespanConfig] = useState<QRLifespanConfig>(DEFAULT_LIFESPAN_CONFIG)
 
     const router = useRouter()
     const supabase = createClient()
@@ -71,6 +75,9 @@ export default function CreateQRCodePage() {
                     name,
                     current_url: url,
                     description: description || undefined,
+                    max_scans: lifespanConfig.maxScans,
+                    expires_at: lifespanConfig.expiresAt,
+                    fallback_url: lifespanConfig.fallbackUrl,
                 }),
             })
 
@@ -137,7 +144,8 @@ export default function CreateQRCodePage() {
         setCreatedCode(null)
         setQrImageUrl(null)
         setCopied(false)
-        resetToDefaults()
+        resetCustomization()
+        setLifespanConfig(DEFAULT_LIFESPAN_CONFIG)
     }
 
     const handleSignOut = async () => {
@@ -346,8 +354,17 @@ export default function CreateQRCodePage() {
                                 onForegroundColorChange={setForegroundColor}
                                 onBackgroundColorChange={setBackgroundColor}
                                 onPatternChange={setPattern}
-                                onReset={resetToDefaults}
+                                onReset={resetCustomization}
                                 hasLowContrast={hasLowContrast}
+                            />
+
+                            {/* QR Lifespan Section */}
+                            <QRLifespanPanel
+                                config={lifespanConfig}
+                                onMaxScansChange={(v) => setLifespanConfig(c => ({ ...c, maxScans: v }))}
+                                onExpiresAtChange={(v) => setLifespanConfig(c => ({ ...c, expiresAt: v }))}
+                                onFallbackUrlChange={(v) => setLifespanConfig(c => ({ ...c, fallbackUrl: v }))}
+                                onReset={() => setLifespanConfig(DEFAULT_LIFESPAN_CONFIG)}
                             />
 
                             <Button

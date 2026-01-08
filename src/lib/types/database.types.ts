@@ -10,6 +10,10 @@ export type QRCode = {
     created_at: string
     updated_at: string
     last_scanned_at: string | null
+    // Lifespan fields (optional)
+    max_scans: number | null
+    expires_at: string | null
+    fallback_url: string | null
 }
 
 export type QRCodeInsert = {
@@ -18,6 +22,10 @@ export type QRCodeInsert = {
     name: string
     current_url: string
     description?: string | null
+    // Lifespan fields (optional)
+    max_scans?: number | null
+    expires_at?: string | null
+    fallback_url?: string | null
 }
 
 export type QRCodeUpdate = {
@@ -27,6 +35,10 @@ export type QRCodeUpdate = {
     is_active?: boolean
     scan_count?: number
     last_scanned_at?: string
+    // Lifespan fields (optional)
+    max_scans?: number | null
+    expires_at?: string | null
+    fallback_url?: string | null
 }
 
 export type Database = {

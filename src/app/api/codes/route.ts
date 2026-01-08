@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json()
-        const { name, current_url, description } = body
+        const { name, current_url, description, max_scans, expires_at, fallback_url } = body
 
         // Validate required fields
         if (!name || !current_url) {
@@ -58,6 +58,26 @@ export async function POST(request: Request) {
         if (!validateUrl(normalizedUrl)) {
             return NextResponse.json(
                 { error: 'Invalid URL format. Must be a valid HTTP or HTTPS URL.' },
+                { status: 400 }
+            )
+        }
+
+        // Validate fallback URL if provided
+        let normalizedFallbackUrl = null
+        if (fallback_url) {
+            normalizedFallbackUrl = normalizeUrl(fallback_url)
+            if (!validateUrl(normalizedFallbackUrl)) {
+                return NextResponse.json(
+                    { error: 'Invalid fallback URL format.' },
+                    { status: 400 }
+                )
+            }
+        }
+
+        // Validate max_scans if provided
+        if (max_scans !== undefined && max_scans !== null && (typeof max_scans !== 'number' || max_scans < 1)) {
+            return NextResponse.json(
+                { error: 'Max scans must be a positive number.' },
                 { status: 400 }
             )
         }
@@ -96,6 +116,9 @@ export async function POST(request: Request) {
                 name,
                 current_url: normalizedUrl,
                 description: description || null,
+                max_scans: max_scans || null,
+                expires_at: expires_at || null,
+                fallback_url: normalizedFallbackUrl,
             })
             .select()
             .single()

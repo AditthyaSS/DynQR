@@ -51,7 +51,7 @@ export async function PATCH(
         }
 
         const body = await request.json()
-        const { name, current_url, description, is_active } = body
+        const { name, current_url, description, is_active, max_scans, expires_at, fallback_url } = body
 
         // Build update object
         const updates: Record<string, unknown> = {}
@@ -69,6 +69,36 @@ export async function PATCH(
                 )
             }
             updates.current_url = normalizedUrl
+        }
+
+        // Handle lifespan fields (can be set to null to clear)
+        if (max_scans !== undefined) {
+            if (max_scans !== null && (typeof max_scans !== 'number' || max_scans < 1)) {
+                return NextResponse.json(
+                    { error: 'Max scans must be a positive number or null.' },
+                    { status: 400 }
+                )
+            }
+            updates.max_scans = max_scans
+        }
+
+        if (expires_at !== undefined) {
+            updates.expires_at = expires_at // Can be null to clear
+        }
+
+        if (fallback_url !== undefined) {
+            if (fallback_url !== null) {
+                const normalizedFallbackUrl = normalizeUrl(fallback_url)
+                if (!validateUrl(normalizedFallbackUrl)) {
+                    return NextResponse.json(
+                        { error: 'Invalid fallback URL format.' },
+                        { status: 400 }
+                    )
+                }
+                updates.fallback_url = normalizedFallbackUrl
+            } else {
+                updates.fallback_url = null
+            }
         }
 
         if (Object.keys(updates).length === 0) {
