@@ -27,6 +27,12 @@ Dynamic QR (dynQR):
 [QR Code] → https://app.com/qr/abc123 → https://example.com  ✅ Update anytime!
 ```
 
+<div align="center">
+  <img src="docs/how-dynqr-works.png" alt="How dynQR Works" width="600" />
+  <br/>
+  <em>One QR code, multiple destinations - change anytime without reprinting!</em>
+</div>
+
 ### Perfect For:
 - 🍽️ **Restaurants** - Update menus without reprinting table stickers
 - 🎉 **Events** - Change event details after flyers are distributed
