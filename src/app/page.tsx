@@ -7,7 +7,8 @@ import {
   Edit3,
   ArrowRight,
   Github,
-  Sparkles
+  Sparkles,
+  Clock
 } from 'lucide-react'
 
 export default function LandingPage() {
@@ -127,10 +128,10 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { icon: Zap, title: 'Instant Redirects', desc: 'Lightning-fast redirects with minimal latency' },
-              { icon: QrCode, title: 'High-Quality QR', desc: 'PNG exports with error correction built-in' },
+              { icon: QrCode, title: 'Custom QR Styles', desc: 'Choose colors and patterns for your QR codes' },
               { icon: Edit3, title: 'Real-time Updates', desc: 'Change destinations instantly from your dashboard' },
               { icon: BarChart3, title: 'Scan Analytics', desc: 'Track scan counts and last scan timestamps' },
-              { icon: Github, title: 'Open Source', desc: 'MIT licensed, fork it, modify it, self-host it' },
+              { icon: Clock, title: 'Auto-Expiry', desc: 'Set scan limits or expiry dates for your QR codes' },
               { icon: Sparkles, title: '100% Free', desc: 'No paywalls, no limits, no credit card required' },
             ].map((feature, i) => (
               <div key={i} className="p-5 bg-slate-800/30 rounded-xl border border-slate-700/50 hover:border-purple-500/50 transition-colors">
